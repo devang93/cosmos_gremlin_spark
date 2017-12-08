@@ -14,7 +14,7 @@ object Main {
 
   def main(args: Array[String]) {
 
-    def getSparkConfig: BaseConfiguration = {
+    def getSparkConfig(args: Array[String]): BaseConfiguration = {
       val conf = new BaseConfiguration()
       // Configuration for the Spark Titan Graph Computer.
       //    conf.setProperty("gremlin.graph", "org.apache.tinkerpop.gremlin.hadoop.structure.HadoopGraph")
@@ -59,17 +59,17 @@ object Main {
       //######################################
 //      conf.setProperty("spark.documentdb.connectionMode", "Gateway")
 //      conf.setProperty("spark.documentdb.schema_samplingratio", "1.0")
-      conf.setProperty("spark.cosmosdb.Endpoint", "https://s00072realtimegraphdb.documents.azure.com:443/")
-      conf.setProperty("spark.cosmosdb.Masterkey", "ygYPc5ifUUexVhNAGcePClFOkrLisO6WmWOT37IbzFIcL68gAZi0Ho32rcuGg3E315EW6TFBTGEMZokn6IjLiw==")
-      conf.setProperty("spark.cosmosdb.Database", "realtimedb")
-      conf.setProperty("spark.cosmosdb.Collection", "posdaily")
-      conf.setProperty("spark.cosmosdb.preferredRegions", "West US")
+      conf.setProperty("spark.cosmosdb.Endpoint", args(0))
+      conf.setProperty("spark.cosmosdb.Masterkey", args(1))
+      conf.setProperty("spark.cosmosdb.Database", args(2))
+      conf.setProperty("spark.cosmosdb.Collection", args(3))
+      conf.setProperty("spark.cosmosdb.preferredRegions", args(4))
 
       conf
     }
 
 //    val gremlinSpark = Spark.create(new SparkContext(new SparkConf().setAppName("Spark_Graph").setMaster("local[*]")))
-    val sparkComputerConnection = GraphFactory.open(getSparkConfig)
+    val sparkComputerConnection = GraphFactory.open(getSparkConfig(args))
     val g = sparkComputerConnection.traversal().withComputer(Predef.classOf[SparkGraphComputer])
 
     Predef.println("Counting using the spark Graph Computer: "+g.V().count().next())
