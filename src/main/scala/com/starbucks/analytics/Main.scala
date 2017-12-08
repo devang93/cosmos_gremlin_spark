@@ -1,20 +1,13 @@
+package com.starbucks.analytics
+
 
 /**
   * Created by depatel on 11/21/17.
   */
 
-import com.twitter.chill.KryoSerializer
 import org.apache.commons.configuration.BaseConfiguration
-import org.apache.spark
-import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.tinkerpop.gremlin.spark.process.computer.SparkGraphComputer
-import org.apache.tinkerpop.gremlin.spark.structure.Spark
-import org.apache.tinkerpop.gremlin.spark.structure.io.gryo.GryoSerializer
 import org.apache.tinkerpop.gremlin.structure.util.GraphFactory
-import org.apache.tinkerpop.gremlin.spark.structure.io.gryo.kryoshim.unshaded.UnshadedKryoShimService
-import org.apache.tinkerpop.gremlin.structure.io.gryo.kryoshim.KryoShimServiceLoader
-
-import scala.Predef.any2stringadd
 
 
 object Main {
@@ -46,6 +39,7 @@ object Main {
       //    conf.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
 
       conf.setProperty("gremlin.graph", "org.apache.tinkerpop.gremlin.hadoop.structure.HadoopGraph")
+      conf.setProperty("gremlin.hadoop.jarsInDistributedCache" , "true")
       conf.setProperty("gremlin.hadoop.defaultGraphComputer", "org.apache.tinkerpop.gremlin.spark.process.computer.SparkGraphComputer")
       conf.setProperty("gremlin.hadoop.graphReader", "com.microsoft.azure.cosmosdb.spark.gremlin.CosmosDBInputRDD")
       conf.setProperty("gremlin.hadoop.graphWriter", "com.microsoft.azure.cosmosdb.spark.gremlin.CosmosDBOutputRDD")
@@ -53,9 +47,9 @@ object Main {
       //####################################
       //# SparkGraphComputer Configuration #
       //####################################
-      conf.setProperty("spark.master", "yarn")
+      conf.setProperty("spark.master", "local")
       conf.setProperty("spark.executor.memory", "1g")
-      conf.setProperty("spark.executor.instances", "1")
+      conf.setProperty("spark.executor.instances", "6")
       conf.setProperty("spark.serializer" , "org.apache.spark.serializer.KryoSerializer")
       conf.setProperty("spark.kryo.registrator", "org.apache.tinkerpop.gremlin.spark.structure.io.gryo.GryoRegistrator")
       conf.setProperty("gremlin.spark.persistContext", "true")
@@ -63,18 +57,18 @@ object Main {
       //######################################
       //# DocumentDB Spark connector         #
       //######################################
-      conf.setProperty("spark.documentdb.connectionMode", "Gateway")
-      conf.setProperty("spark.documentdb.schema_samplingratio", "1.0")
-      conf.setProperty("spark.documentdb.Endpoint", "https://dapcosmosdb.documents.azure.com:443/")
-      conf.setProperty("spark.documentdb.Masterkey", "uc6OZ47SHDjoWDn1DPrFqqUj6KyyeaMF4QGGXU9WbZr7K4iWk2JrR1IrLEfcFcCOaY9OHvlr3lfoLtl7teJo0g==")
-      conf.setProperty("spark.documentdb.Database", "realtimedb")
-      conf.setProperty("spark.documentdb.Collection", "posdaily")
-      conf.setProperty("spark.documentdb.preferredRegions", "West US")
+//      conf.setProperty("spark.documentdb.connectionMode", "Gateway")
+//      conf.setProperty("spark.documentdb.schema_samplingratio", "1.0")
+      conf.setProperty("spark.cosmosdb.Endpoint", "https://s00072realtimegraphdb.documents.azure.com:443/")
+      conf.setProperty("spark.cosmosdb.Masterkey", "ygYPc5ifUUexVhNAGcePClFOkrLisO6WmWOT37IbzFIcL68gAZi0Ho32rcuGg3E315EW6TFBTGEMZokn6IjLiw==")
+      conf.setProperty("spark.cosmosdb.Database", "realtimedb")
+      conf.setProperty("spark.cosmosdb.Collection", "posdaily")
+      conf.setProperty("spark.cosmosdb.preferredRegions", "West US")
 
       conf
     }
 
-    val gremlinSpark = Spark.create(new SparkContext(new SparkConf().setAppName("Spark_Graph").setMaster("local[*]")))
+//    val gremlinSpark = Spark.create(new SparkContext(new SparkConf().setAppName("Spark_Graph").setMaster("local[*]")))
     val sparkComputerConnection = GraphFactory.open(getSparkConfig)
     val g = sparkComputerConnection.traversal().withComputer(Predef.classOf[SparkGraphComputer])
 
