@@ -70,9 +70,9 @@ object Main {
 
 //    val gremlinSpark = Spark.create(new SparkContext(new SparkConf().setAppName("Spark_Graph").setMaster("local[*]")))
     val sparkComputerConnection = GraphFactory.open(getSparkConfig(args))
-    val g = sparkComputerConnection.traversal().withComputer(Predef.classOf[SparkGraphComputer])
+    val g = sparkComputerConnection.traversal().withComputer(classOf[SparkGraphComputer])
 
-    Predef.println("Counting using the spark Graph Computer: "+g.V().count().next())
+    println("Counting using the spark Graph Computer: "+g.V().count().next())
 
     sparkComputerConnection.close()
 
